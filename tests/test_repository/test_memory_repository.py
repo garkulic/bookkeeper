@@ -69,3 +69,15 @@ def test_get_all_with_condition(repo, custom_class):
         objects.append(o)
     assert repo.get_all({'name': '0'}) == [objects[0]]
     assert repo.get_all({'test': 'test'}) == objects
+
+def test_get_like(repo, custom_class):
+    objects = []
+    for i in range(5):
+        o = custom_class()
+        o.name = "__"+str(i)+"__"
+        o.test = 'test'
+        repo.add(o)
+        objects.append(o)
+    assert repo.get_all_like({'name': '0'}) == [objects[0]]
+    assert repo.get_all_like({'test': 'test'}) == objects
+

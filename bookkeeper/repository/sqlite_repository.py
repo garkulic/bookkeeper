@@ -23,7 +23,7 @@ class SqliteRepository(AbstractRepository[T]):
         if getattr(obj, 'pk', None) != 0:
             raise ValueError(f'trying to add object {obj} with filled `pk` attribute')
         names = ', '.join(self.fields.keys())
-        questions = ', '.join("?" * len(self.fields))
+        p = ', '.join("?" * len(self.fields))
         values = [getattr(obj, f) for f in self.fields]
         with sqlite3.connect(self.db_file) as con:
             cur = con.cursor()
@@ -32,12 +32,12 @@ class SqliteRepository(AbstractRepository[T]):
                 f'INSERT INTO {self.table_name} ({names}) VALUES({questions})',
                 values
             )
-            if (type(cur.lastrowid) is int):
+            if (type(cur.lastrowid) is int): 
                 obj.pk = cur.lastrowid
         con.close()
         return obj.pk
     
-    """ метод преобразует строку в объект типа Т """
+    """ Метод преобразует строку в объект типа Т """
     def _row2obj(self, rowid: int, row: tuple[Any]) -> T:
         kwargs = dict(zip(self.fields, row))
         obj = self.obj_cls(**kwargs)
@@ -60,7 +60,7 @@ class SqliteRepository(AbstractRepository[T]):
     def get_all(self, where: dict[str, Any] | None = None) -> list[T]:
         with sqlite3.connect(self.db_file) as con:
             cur = con.cursor()
-            if where is None:
+            if where is None: #если условие не задано (по умолчанию), вернуть все записи
                 rows = cur.execute(
                     f'SELECT ROWID, * FROM {self.table_name} '
                 ).fetchall()
@@ -74,6 +74,11 @@ class SqliteRepository(AbstractRepository[T]):
         con.close()
         return [self._row2obj(r[0], r[1:-1]) for r in rows]
     
+    def get_all_like(self, like: dict[str, str]) -> list[T]:
+        values = [f"%{v}%" for v in like.values()]
+        where = dict(zip(like.keys(), values))
+        return self.get_all(where=where)
+
     def update(self, obj: T) -> None:
         fields = ", ".join([f"{f}=?" for f in self.fields.keys()])
         values = [getattr(obj, f) for f in self.fields]
@@ -85,9 +90,10 @@ class SqliteRepository(AbstractRepository[T]):
                 values
             )
             if cur.rowcount == 0:
-                raise ValueError('attempt to update object with unknown primary key')
+                raise ValueError('No object with such primary key in DB to update.')
         con.close()
 
+    """ Удалить запись """
     def delete(self, pk: int) -> None:
         with sqlite3.connect(self.db_file) as con:
             cur = con.cursor()
@@ -96,5 +102,13 @@ class SqliteRepository(AbstractRepository[T]):
                 + f'WHERE ROWID=={pk}'
             )
             if cur.rowcount == 0:
-                raise ValueError('attempt to delete object with unknown primary key')
+                raise ValueError('No object with such primary key in DB to delete.')
         con.close()
+
+    """ Удалить все записи """
+    def delete_all(self) -> None:
+        with sqlite3.connect(self.db_file) as con:
+            cur = con.cursor()
+            cur.execute('PRAGMA foreign_keys = ON')
+            cur.execute(f'DELETE FROM {self.table_name}')
+            con.close()

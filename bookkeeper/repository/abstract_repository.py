@@ -28,6 +28,7 @@ class AbstractRepository(ABC, Generic[T]):
     add
     get
     get_all
+    get_all_like
     update
     delete
     """
@@ -49,6 +50,13 @@ class AbstractRepository(ABC, Generic[T]):
         Получить все записи по некоторому условию
         where - условие в виде словаря {'название_поля': значение}
         если условие не задано (по умолчанию), вернуть все записи
+        """
+
+    @abstractmethod
+    def get_all_like(self, like: dict[str, str]) -> list[T]:
+        """
+        Получить все записи по условию like
+        like - условие в виде словаря {'название_поля': значение}
         """
 
     @abstractmethod

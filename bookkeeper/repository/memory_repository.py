@@ -33,6 +33,10 @@ class MemoryRepository(AbstractRepository[T]):
             return list(self._container.values())
         return [obj for obj in self._container.values()
                 if all(getattr(obj, attr) == value for attr, value in where.items())]
+    
+    def get_all_like(self, like: dict[str, str]) -> list[T]:
+        return [obj for obj in self._container.values()
+                if all(value in getattr(obj, attr) for attr, value in like.items())]
 
     def update(self, obj: T) -> None:
         if obj.pk == 0:
