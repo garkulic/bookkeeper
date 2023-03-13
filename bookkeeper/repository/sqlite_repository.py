@@ -29,7 +29,7 @@ class SqliteRepository(AbstractRepository[T]):
             cur = con.cursor()
             cur.execute('PRAGMA foreign_keys = ON')
             cur.execute(
-                f'INSERT INTO {self.table_name} ({names}) VALUES({questions})',
+                f'INSERT INTO {self.table_name} ({names}) VALUES({p})',
                 values
             )
             if (type(cur.lastrowid) is int): 

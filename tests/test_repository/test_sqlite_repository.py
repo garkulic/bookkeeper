@@ -56,8 +56,6 @@ def test_crud(repo, custom_class):
     obj2.pk = pk
     repo.update(obj2)
     assert repo.get(pk) == obj2
-    assert obj. == obj_upd.f1
-    assert obj_get_upd.field_int == obj_upd.f2
     
     # delete
     repo.delete(pk)
