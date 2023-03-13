@@ -13,13 +13,13 @@ class Budget:
     limit - максимальное ограничение на затраты за период,
     spent - сумма, потрачнная за период
     """
-    period: str = 'default'
+    period: str 
     limit: int = 0
     spent: int = 0
     pk: int = 0
-    def __init__(self, period: str = 'default', limit: int = 0,
+    def __init__(self, period: str, limit: int = 0,
                        spent: int = 0, pk: int = 0):
-        if period not in ['Day', 'Week', 'Month', 'default']:
+        if period not in ['Day', 'Week', 'Month']:
             raise ValueError(f'unknown period "{period}"')
         self.period = period
         self.limit = limit
