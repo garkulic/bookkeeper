@@ -37,6 +37,13 @@ class SqliteRepository(AbstractRepository[T]):
         con.close()
         return obj.pk
     
+    """ метод преобразует строку в объект типа Т """
+    def _row2obj(self, rowid: int, row: tuple[Any]) -> T:
+        kwargs = dict(zip(self.fields, row))
+        obj = self.obj_cls(**kwargs)
+        obj.pk = rowid
+        return obj
+
     def get(self, pk: int) -> T | None:
         with sqlite3.connect(self.db_file) as con:
             cur = con.cursor()
