@@ -4,11 +4,13 @@
 import sqlite3
 
 from inspect import get_annotations
-from typing import Any, Optional
+from typing import Any
 
 from bookkeeper.repository.abstract_repository import AbstractRepository, T
 
+
 class SqliteRepository(AbstractRepository[T]):
+
     """
     Репозиторий для SQLite. Хранит данные в БД.
     """
@@ -32,11 +34,11 @@ class SqliteRepository(AbstractRepository[T]):
                 f'INSERT INTO {self.table_name} ({names}) VALUES({p})',
                 values
             )
-            if (type(cur.lastrowid) is int): 
+            if (type(cur.lastrowid) is int):
                 obj.pk = cur.lastrowid
         con.close()
         return obj.pk
-    
+
     """ Метод преобразует строку в объект типа Т """
     def _row2obj(self, rowid: int, row: tuple[Any]) -> T:
         kwargs = dict(zip(self.fields, row))
@@ -56,11 +58,11 @@ class SqliteRepository(AbstractRepository[T]):
             return None
         obj = self._row2obj(pk, row)
         return obj
-    
+
     def get_all(self, where: dict[str, Any] | None = None) -> list[T]:
         with sqlite3.connect(self.db_file) as con:
             cur = con.cursor()
-            if where is None: #если условие не задано (по умолчанию), вернуть все записи
+            if where is None:  # если условие не задано (по умолчанию), вернуть все записи
                 rows = cur.execute(
                     f'SELECT ROWID, * FROM {self.table_name} '
                 ).fetchall()
@@ -73,7 +75,7 @@ class SqliteRepository(AbstractRepository[T]):
                 ).fetchall()
         con.close()
         return [self._row2obj(r[0], r[1:-1]) for r in rows]
-    
+
     def get_all_like(self, like: dict[str, str]) -> list[T]:
         values = [f"%{v}%" for v in like.values()]
         where = dict(zip(like.keys(), values))
