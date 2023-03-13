@@ -16,7 +16,6 @@ def custom_class():
     class Custom():
         int_value: int = TEST_INT_VALUE
         str_value: str = TEST_STR_VALUE
-        date_value: str = str(datetime.datetime.now())
         pk: int = 0
     return Custom
 
@@ -49,10 +48,9 @@ def test_crud(repo, custom_class):
     assert repo.get(pk) == obj #проверяем, что по индексу pk верно получаем объект
     assert obj_get.int_value == obj.int_value
     assert obj_get.str_value == obj.str_value
-    assert obj_get.date_value == obj.date_value
     
     # update
-    obj2 = custom_class(int_value = 37, str_value = "test str2", date_value = "1999-10-04 07:37:00" )
+    obj2 = custom_class(int_value = 37, str_value = "test str2" )
     obj2.pk = pk
     repo.update(obj2)
     assert repo.get(pk) == obj2

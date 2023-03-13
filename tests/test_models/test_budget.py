@@ -12,7 +12,7 @@ def repo():
     return MemoryRepository()
 
 def test_create_object():
-    b = Budget(100, "Day")
+    b = Budget("Day", 100)
     assert b.pk == 0
     assert b.period == "Day"
     assert b.limit == 100
@@ -28,12 +28,12 @@ def test_create_object():
         b = Budget(limit=100500, period="Year")
 
 def test_can_add_to_repo(repo):
-    b = Budget(100, "Day")
+    b = Budget("Day", 100)
     pk = repo.add(b)
     assert b.pk == pk
 
 def test_update_spent_day(repo):
-    b = Budget(100, "Day")
+    b = Budget("Day", 100)
     for i in range(5):
         e = Expense(100, 1)
         repo.add(e)
